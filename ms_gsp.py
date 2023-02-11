@@ -6,9 +6,13 @@ import re
 # sorted_items = list of itemsets sorted by min support
 # sequences = list of all sequences
 def init_pass(sorted_items, sequences):
+    total=len(sequences)
+    seqs=''.join(sequences)
+    supcnt={}
     for item in sorted_items:
-        pass
-
+        cnt=seqs.count(item)
+        supcnt[item]=(cnt/total)     
+        
 # create a frequent item set
 # items = list of itemset
 # min_supports = min support of items
@@ -36,6 +40,7 @@ def ms_gsp(sequences, min_supports):
     #sorted_itemsets = []
     # call init_pass(sorted_items, sequences) to generate initial candidate set
     candidate_sequence = init_pass(sorted_itemsets, sequences)
+    
     # create frequent item set 1 with elements in candidate_sequence having min support
     frequent_items = initial_frequent_item_set(candidate_sequence, min_supports)
 
@@ -44,6 +49,7 @@ def ms_gsp(sequences, min_supports):
     while(len(frequent_items) > 0):
         candidate_sequence = ms_candidate_gen(frequent_items, min_supports)
     pass
+
 
 
 
@@ -60,10 +66,8 @@ def sort_itemsets(I):
             if mis[val]<minsup:
                 minsup=mis[val]
         minsup_items.append(minsup)
-    
-    print(I)
+
     minsup_items.sort()
-    print(minsup_items)
     sorted_itemsets = [i for _,i in sorted(zip(minsup_items,I))]
     return sorted_itemsets, minsup_items    
 
@@ -88,7 +92,6 @@ f.close()
 
 f=open("data1.txt","r")
 seqs=f.readlines()
-print(seqs)
 
 I=[]
 
@@ -106,3 +109,4 @@ sorted_itemsets,minsup_items=sort_itemsets(I)
 print(sorted_itemsets)
 print(minsup_items)
 
+#ms_gsp(seqs,mis)
