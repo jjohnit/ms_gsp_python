@@ -6,7 +6,8 @@ import re
 # sorted_items = list of itemsets sorted by min support
 # sequences = list of all sequences
 def init_pass(sorted_items, sequences):
-    pass
+    for item in sorted_items:
+        pass
 
 # create a frequent item set
 # items = list of itemset
@@ -61,9 +62,10 @@ def sort_itemsets(I):
         minsup_items.append(minsup)
     
     print(I)
+    minsup_items.sort()
     print(minsup_items)
     sorted_itemsets = [i for _,i in sorted(zip(minsup_items,I))]
-    return sorted_itemsets    
+    return sorted_itemsets, minsup_items    
 
 
 #Pre-processing of data
@@ -86,7 +88,7 @@ f.close()
 
 f=open("data1.txt","r")
 seqs=f.readlines()
-#print(seqs)
+print(seqs)
 
 I=[]
 
@@ -100,5 +102,7 @@ for seq in seqs:
         I.append(i)
 
 I=[*set(I)]
-sorted_itemsets=sort_itemsets(I)
+sorted_itemsets,minsup_items=sort_itemsets(I)
+print(sorted_itemsets)
+print(minsup_items)
 
