@@ -6,12 +6,24 @@ import re
 # sorted_items = list of itemsets sorted by min support
 # sequences = list of all sequences
 def init_pass(sorted_items, sequences):
+    L=[] 
     total=len(sequences)
     seqs=''.join(sequences)
     supcnt={}
     for item in sorted_items:
         cnt=seqs.count(item)
-        supcnt[item]=(cnt/total)     
+        supcnt[item]=(cnt/total)  
+        
+    for item_list in seqs_list:
+        L1=[]
+        minsup=-1
+        for item in item_list:
+            ind=sorted_items.index(item)
+            if minsup!=-1:
+                if supcnt[item]>=minsup:
+                    L1.append(item)
+            
+        
         
 # create a frequent item set
 # items = list of itemset
@@ -57,19 +69,10 @@ def ms_gsp(sequences, min_supports):
 def sort_itemsets(I):
     minsup_items=[]
     for item in I:
-        item1=item[1:]
-        item1=item1[:-1]
-        each=item1.split(',')
-        minsup=1
-        for val in each:
-            val=val.strip()
-            if mis[val]<minsup:
-                minsup=mis[val]
-        minsup_items.append(minsup)
-
-    minsup_items.sort()
+        minsup_items.append(mis[item])
     sorted_itemsets = [i for _,i in sorted(zip(minsup_items,I))]
-    return sorted_itemsets, minsup_items    
+    return sorted_itemsets   
+    
 
 
 #Pre-processing of data
@@ -94,19 +97,25 @@ f=open("data1.txt","r")
 seqs=f.readlines()
 
 I=[]
+seqs_list=[]
 
 for seq in seqs:
+    item_list=[]
     seqsRegex = re.compile(r'({.*})')
     mo=seqsRegex.search(seq)
     list1=mo.group(1).split('}');
     list1.pop()
     for i in list1:
-        i+='}';
-        I.append(i)
+        i=i[1:]
+        i1=i.split(',')
+        for i1_item in i1:
+            i1_item=i1_item.strip();
+            item_list.append(i1_item)
+            I.append(i1_item);
+    seqs_list.append(item_list)
 
 I=[*set(I)]
-sorted_itemsets,minsup_items=sort_itemsets(I)
+sorted_itemsets=sort_itemsets(I)
 print(sorted_itemsets)
-print(minsup_items)
 
 #ms_gsp(seqs,mis)
