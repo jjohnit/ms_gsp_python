@@ -24,8 +24,11 @@ def init_pass(sorted_items, seqs_list):
                 else:
                     if supcnt[item]>=min_sup:
                         L_grp_item.append(item)
-            L_grp.append(L_grp_item)
-        L.append(L_grp)
+            if L_grp_item!=[]:
+                L_grp.append(L_grp_item)
+        if L_grp!=[]:
+            L.append(L_grp)
+    print("L:")    
     print(L)
     return L
         
@@ -90,7 +93,9 @@ def sort_itemsets(I):
 
 
 #Pre-processing of data
-f = open("para1.txt", "r")
+para_file=str(input('Enter parameter file name:'))
+data_file=str(input('Enter data file name:'))
+f = open(para_file, "r")
 lines=f.readlines()
 mis={}
 SDC=0
@@ -107,7 +112,7 @@ for line in lines:
 
 f.close()
 
-f=open("data1.txt","r")
+f=open(data_file,"r")
 seqs=f.readlines()
 
 I=[]
@@ -133,6 +138,7 @@ for seq in seqs:
         i_list.append(item_list)
     seqs_list.append(i_list)
 total_cnt=len(seqs)
+#print(seqs)
 I=[*set(I)]
 supcnt={}
 ms_gsp(seqs_list,mis)
