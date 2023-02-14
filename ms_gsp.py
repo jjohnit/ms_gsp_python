@@ -53,8 +53,30 @@ def frequent_item_set(candidate_set, previous_frequent_set):
     pass
 
 # Create lvl 2 candidate sequence 
-def lvl_2_candidate_gen(sequences_2):
-    pass
+def lvl_2_candidate_gen(L):
+    C2=[]
+    for seq in L:
+        for grp in seq:
+            for item in grp:
+                if supcnt[item]>=mis[item]:
+                    for i in range(grp.index(item)+1,len(grp)):
+                        if ((supcnt[grp[i]]>=mis[item]) and (abs(supcnt[grp[i]]-supcnt[item])<=SDC)):
+                                      C2.append([[item,grp[i]]])
+                    for i in range(seq.index(grp)+1,len(seq)):
+                        for item2 in seq[i]:
+                            if ((supcnt[item2]>=mis[item]) and (abs(supcnt[item2]-supcnt[item])<=SDC)):
+                                      C2.append([[item],[item2]])
+                            
+    print('C2:')
+    C2.sort()
+    k=0
+    while k<len(C2) and k+1<len(C2):
+        if C2[k]==C2[k+1]:
+            del C2[k+1]
+        else:
+            k=k+1
+    print(C2)
+    return C2
 
 # for creating min support candidate sets
 def ms_candidate_gen(frequent_set, min_supports):
@@ -71,9 +93,10 @@ def ms_gsp(sequences, min_supports):
     # call init_pass(sorted_items, sequences) to generate initial candidate set
     L = init_pass(sorted_itemsets, sequences)
     # create frequent item set 1 with elements in candidate_sequence having min support
-    frequent_items = initial_frequent_item_set(L, mis)
+    F1 = initial_frequent_item_set(L, mis)
+    # create candidate for level 2
+    C2 = lvl_2_candidate_gen(L)
 '''
-    candidate_sequence = lvl_2_candidate_gen(candidate_sequence)
     frequent_items = frequent_item_set(candidate_sequence, frequent_items)
     while(len(frequent_items) > 0):
         candidate_sequence = ms_candidate_gen(frequent_items, min_supports)
