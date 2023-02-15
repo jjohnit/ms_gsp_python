@@ -1,5 +1,6 @@
 # importing modules
 import re
+import copy
 
 
 # Initial pass to create initial candidate set
@@ -79,14 +80,48 @@ def lvl_2_candidate_gen(L):
     return C2
 
 # for creating min support candidate sets
-def ms_candidate_gen(frequent_set, min_supports):
-    pass
+def ms_candidate_gen(F_prev, mis):
+    C=[]
+    F_prev_copy = copy.deepcopy(F_prev)
+    print(F_prev_copy)
+    
+    for i in range(0,len(F_prev)):
+        for j in range(i,len(F_prev)):
+            print("\n\n")
+            print(F_prev[i])
+            print(F_prev[j])
+            '''
+            if F_prev[i][0][1:]==F_prev[j][len(F_prev[j])-1][0:len(F_prev[j])-1] 
+            and mis[F_prev[i][0][0]]<=mis[F_prev[j][len(F_prev[j])-1][len()]]:
+                pass
+            '''
+            F_prev_copy = copy.deepcopy(F_prev)
+            if F_prev_copy[i][0]!=[]:
+                temp1=F_prev_copy[i][0].pop(0)
+                if F_prev_copy[i][0]
+                print(temp1)
+            F_prev_copy = copy.deepcopy(F_prev)
+            if F_prev_copy[j][len(F_prev[j])-1]!=[]:
+                temp2=F_prev_copy[j][len(F_prev[j])-1].pop()
+                
+                print(temp2)
+                
+            if temp1==temp2:
+                print(F_prev[i],F_prev[j])
+            
+    
+        
+    
+            
+        
 
 
 # MS GSP algorithm with params
 # sequences = list of all sequenses
 # min_supports = list of all minimum supports
 def ms_gsp(sequences, min_supports):
+    #Final result
+    F=[]
     # sort the itemsets in the sequences based on the ms value to create 'sorted_itemsets'
     #sorted_itemsets = []
     sorted_itemsets=sort_itemsets(I)
@@ -94,8 +129,18 @@ def ms_gsp(sequences, min_supports):
     L = init_pass(sorted_itemsets, sequences)
     # create frequent item set 1 with elements in candidate_sequence having min support
     F1 = initial_frequent_item_set(L, mis)
-    # create candidate for level 2
-    C2 = lvl_2_candidate_gen(L)
+    F.append(F1)
+    k=1
+    while F[k-1]!=[]:
+        # create candidate for level 2
+        if k==1:
+            candidate = lvl_2_candidate_gen(L)
+        else:
+            candidate = ms_candidate_gen(F[k-1], mis)
+        
+            
+        F.append(candidate) #As of now, all candidates appended
+        k=k+1
 '''
     frequent_items = frequent_item_set(candidate_sequence, frequent_items)
     while(len(frequent_items) > 0):
