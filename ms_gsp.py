@@ -3,34 +3,51 @@ import re
 
 
 # Initial pass to create initial candidate set
-# sorted_items = list of itemsets sorted by min support
-# sequences = list of all sequences
-def init_pass(sorted_items, seqs_list):
-    L = []
+# sorted_items = list of items sorted by min support
+# seqs_list = list of all sequences
+# min_support = minimum support
+def init_pass(sorted_items, all_sequences, min_support):
+    init_candidate_set = []
+    print('Minimum support is ', min_support)
+    total_sequences = len(all_sequences)
     # seqs1="".join(seqs)
     # for item in sorted_items:
     #     supcnt[item]=(seqs1.count(item)/total_cnt)
-    for seq in seqs_list:
-        L_grp = []
-        for grp in seq:
-            L_grp_item = []
-            min_sup = -1
-            for item in grp:
-                if min_sup == -1:
-                    if supcnt[item] >= mis[item]:
-                        L_grp_item.append(item)
-                        min_sup = mis[item]
+    # Find support count of each item by iterating through the sequences
+    support_counts = {}
+    for item in sorted_items:
+        for seq in all_sequences:
+            for itemset in seq:
+                if(item in itemset):
+                    support_counts[item] = 1 if(support_counts.get(item) == None) else (support_counts[item] + 1)
+                    break
 
-                else:
-                    if supcnt[item] >= min_sup:
-                        L_grp_item.append(item)
-            if L_grp_item != []:
-                L_grp.append(L_grp_item)
-        if L_grp != []:
-            L.append(L_grp)
-    print("L:")
-    print(L)
-    return L
+    print('Support counts are ', support_counts)
+    # Add items with minimum support to the init_candidate_set
+    for item in sorted_items:
+        if (support_counts[item] / total_sequences) >= min_support:
+            init_candidate_set.append(item)
+
+    # for seq in all_sequences:
+    #     # L_grp = []
+    #     for itemset in seq:
+    #         L_grp_item = []
+    #         min_sup = -1
+    #         for item in itemset:
+    #             if min_sup == -1:
+    #                 if supcnt[item] >= mis[item]:
+    #                     L_grp_item.append(item)
+    #                     min_sup = mis[item]
+
+    #             else:
+    #                 if supcnt[item] >= min_sup:
+    #                     L_grp_item.append(item)
+    #         if L_grp_item != []:
+    #             L_grp.append(L_grp_item)
+    #     if L_grp != []:
+    #         L.append(L_grp)
+    print("Initial candidate set is ", init_candidate_set)
+    return init_candidate_set
 
 
 # create a frequent item set
@@ -88,20 +105,32 @@ def lvl_2_candidate_gen(L):
 def ms_candidate_gen(frequent_set, min_supports):
     pass
 
+# Function for sorting the items based on the minimum support
+
+
+def sort_items(all_items, min_supports):
+    minsup_items = []
+    for item in all_items:
+        minsup_items.append(min_supports[item])
+    sorted_items = [i for _, i in sorted(zip(minsup_items, all_items))]
+    return sorted_items
 
 # MS GSP algorithm with params
 # sequences = list of all sequenses
 # min_supports = list of all minimum supports
-def ms_gsp(sequences, min_supports, item_set, sup_count):
+
+
+def ms_gsp(sequences, min_supports, all_items):
     # sort the items set in the sequences based on the ms value to create 'sorted_itemsets'
-    #sorted_itemsets = []
-    sorted_itemsets = sort_itemsets(item_set)
-    # call init_pass(sorted_items, sequences) to generate initial candidate set
-    L = init_pass(sorted_itemsets, sequences)
+    sorted_items = sort_items(all_items, min_supports)
+    print('Items sorted based on minimum support: ', sorted_items)
+    # call init_pass(sorted_items, sequences, minumum support) to generate initial candidate set
+    init_candidate_list = init_pass(
+        sorted_items, sequences, min_supports[sorted_items[0]])
     # create frequent item set 1 with elements in candidate_sequence having min support
-    F1 = initial_frequent_item_set(L, mis)
+    # F1 = initial_frequent_item_set(init_candidate_list, min_supports)
     # create candidate for level 2
-    C2 = lvl_2_candidate_gen(L)
+    # C2 = lvl_2_candidate_gen(init_candidate_list)
 
 
 '''
@@ -110,15 +139,6 @@ def ms_gsp(sequences, min_supports, item_set, sup_count):
         candidate_sequence = ms_candidate_gen(frequent_items, min_supports)
     pass
 '''
-
-
-# Function for sorting the itemsets
-def sort_itemsets(item_set, mis):
-    minsup_items = []
-    for item in item_set:
-        minsup_items.append(mis[item])
-    sorted_itemsets = [i for _, i in sorted(zip(minsup_items, item_set))]
-    return sorted_itemsets
 
 
 # Pre-processing of data
@@ -213,4 +233,4 @@ print('Count of sequences is ', sequences_count)
 # seqs_text = "".join(lines)
 # for item in all_items:
 #     sup_count[item] = (seqs_text.count(item)/sequences_count)
-# ms_gsp(all_sequences, min_supports, all_items, sup_count)
+ms_gsp(all_sequences, min_supports, all_items)
