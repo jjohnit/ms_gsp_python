@@ -10,9 +10,6 @@ def init_pass(sorted_items, all_sequences, min_support):
     init_candidate_set = []
     print('Minimum support is ', min_support)
     total_sequences = len(all_sequences)
-    # seqs1="".join(seqs)
-    # for item in sorted_items:
-    #     supcnt[item]=(seqs1.count(item)/total_cnt)
     # Find support count of each item by iterating through the sequences
     support_counts = {}
     for item in sorted_items:
@@ -28,24 +25,6 @@ def init_pass(sorted_items, all_sequences, min_support):
         if (support_counts[item] / total_sequences) >= min_support:
             init_candidate_set.append(item)
 
-    # for seq in all_sequences:
-    #     # L_grp = []
-    #     for itemset in seq:
-    #         L_grp_item = []
-    #         min_sup = -1
-    #         for item in itemset:
-    #             if min_sup == -1:
-    #                 if supcnt[item] >= mis[item]:
-    #                     L_grp_item.append(item)
-    #                     min_sup = mis[item]
-
-    #             else:
-    #                 if supcnt[item] >= min_sup:
-    #                     L_grp_item.append(item)
-    #         if L_grp_item != []:
-    #             L_grp.append(L_grp_item)
-    #     if L_grp != []:
-    #         L.append(L_grp)
     print("Initial candidate set is ", init_candidate_set)
     return init_candidate_set
 
@@ -189,36 +168,24 @@ for line in lines:
     seqs_regex = re.compile(r'({.*})')
     # Extract the item sets in each sequence
     item_sets = seqs_regex.search(line)
-    # print('sequence is ', item_sets)
     # Create the sequence as a list of item sets
     sequence_txt = item_sets.group(1).split('}')
     sequence = []
-    # print('Sequence set is ', sequence_txt)
     # Removing the empty string at the end
     sequence_txt.pop()
-    # print('Sequence set after popping is ', sequence_txt)
     for i in sequence_txt:
         item_list = []
         # Ignore the 1st char '{'
         i = i[1:]
         # For getting each item in the sequence
         items = i.split(',')
-        # print('items is ', items)
-        # mis_list = []
         # Create the item list as a list to be added to the sequence list
         for item in items:
             item = item.strip()
             item_list.append(item)
             all_items.add(item)
-            # mis_list.append(min_supports[item])
-        # print('All items list is ', all_items)
-        # print('Item list before sorting ', item_list)
-        # item_list = [i for _, i in sorted(zip(mis_list, item_list))]
-        # print('Item list after sorting ', item_list)
-        # sequence_of_sorted_items.append(item_list)
         # Add the item list to the sequence
         sequence.append(item_list)
-    # all_sequences.append(sequence_of_sorted_items)
     # Add the sequence to all sequences
     all_sequences.append(sequence)
 f.close()
@@ -227,10 +194,4 @@ print('Final items are ', all_items)
 # total_cnt=len(lines)
 sequences_count = len(all_sequences)
 print('Count of sequences is ', sequences_count)
-# for i in all_sequences:
-#     sequences_count += len(i)
-# sup_count = {}
-# seqs_text = "".join(lines)
-# for item in all_items:
-#     sup_count[item] = (seqs_text.count(item)/sequences_count)
 ms_gsp(all_sequences, min_supports, all_items)
