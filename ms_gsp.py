@@ -26,23 +26,20 @@ def init_pass(sorted_items, all_sequences, min_support):
             init_candidate_set.append(item)
 
     print("Initial candidate set is ", init_candidate_set)
-    return init_candidate_set
+    return init_candidate_set, support_counts
 
 
 # create a frequent item set
 # items = list of itemset
 # min_supports = min support of items
-def initial_frequent_item_set(L, mis):
-    F1 = []
-
-    for seq in L:
-        for grp in seq:
-            for item in grp:
-                if supcnt[item] >= mis[item]:
-                    F1.append(item)
-    F1 = [*set(F1)]
-    print(F1)
-    return F1
+# def initial_frequent_item_set(candidate_set, min_supports, support_counts):
+#     freq_item_set = set()
+#     for seq in candidate_set:
+#         # Initial candidate set contains items instead of item sets
+#         if support_counts[item] >= min_supports[item]:
+#             freq_item_set.add(item)
+#     print("Frequent item set 1 is ", freq_item_set)
+#     return freq_item_set
 
 # Create the frequent item set using the candidate set and previous frequent set
 
@@ -104,10 +101,16 @@ def ms_gsp(sequences, min_supports, all_items):
     sorted_items = sort_items(all_items, min_supports)
     print('Items sorted based on minimum support: ', sorted_items)
     # call init_pass(sorted_items, sequences, minumum support) to generate initial candidate set
-    init_candidate_list = init_pass(
-        sorted_items, sequences, min_supports[sorted_items[0]])
+    init_candidate_list, support_counts = init_pass(sorted_items, sequences, min_supports[sorted_items[0]])
     # create frequent item set 1 with elements in candidate_sequence having min support
-    # F1 = initial_frequent_item_set(init_candidate_list, min_supports)
+    # freq_item_set_1 = initial_frequent_item_set(init_candidate_list, min_supports, support_counts)
+    total_sequences = len(sequences)
+    freq_item_set = set()
+    for item in init_candidate_list:
+        # Initial candidate set contains items instead of item sets
+        if (support_counts[item] / total_sequences) >= min_supports[item]:
+            freq_item_set.add(item)
+    print("Frequent item set 1 is ", freq_item_set)
     # create candidate for level 2
     # C2 = lvl_2_candidate_gen(init_candidate_list)
 
