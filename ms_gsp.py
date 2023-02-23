@@ -24,6 +24,26 @@ def init_pass(sorted_items, all_sequences, min_support):
     for key in support_counts.keys():
         support_counts[key] = support_counts[key] / total_sequences
     # Add items with minimum support to the init_candidate_set
+# sorted_items = list of items sorted by min support
+# seqs_list = list of all sequences
+# min_support = minimum support
+def init_pass(sorted_items, all_sequences, min_support):
+    init_candidate_set = []
+    print('Minimum support is ', min_support)
+    total_sequences = len(all_sequences)
+    # Find support count of each item by iterating through the sequences
+    support_counts = {}
+    for item in sorted_items:
+        for seq in all_sequences:
+            for itemset in seq:
+                if(item in itemset):
+                    support_counts[item] = 1 if(support_counts.get(item) == None) else (support_counts[item] + 1)
+                    break                    
+    print('Support counts are ', support_counts)
+    # Convert the support count to percentage
+    for key in support_counts.keys():
+        support_counts[key] = support_counts[key] / total_sequences
+    # Add items with minimum support to the init_candidate_set
     for item in sorted_items:
         if support_counts[item] >= min_support:
             init_candidate_set.append(item)
@@ -231,6 +251,41 @@ f = open(sequences_file, "r")
 lines = f.readlines()
 # Item set for storing all seperate item (eg: {10, 40, 50,...})
 all_items = set()
+
+# List to store all sequences extracted from the file
+all_sequences = []
+for line in lines:
+    # sequence_of_sorted_items = []
+    seqs_regex = re.compile(r'({.*})')
+    # Extract the item sets in each sequence
+    item_sets = seqs_regex.search(line)
+    # Create the sequence as a list of item sets
+    sequence_txt = item_sets.group(1).split('}')
+    sequence = []
+    # Removing the empty string at the end
+    sequence_txt.pop()
+    for i in sequence_txt:
+        item_list = []
+        # Ignore the 1st char '{'
+        i = i[1:]
+        # For getting each item in the sequence
+        items = i.split(',')
+        # Create the item list as a list to be added to the sequence list
+        for item in items:
+            item = item.strip()
+            item_list.append(item)
+            all_items.add(item)
+        # Add the item list to the sequence
+        sequence.append(item_list)
+    # Add the sequence to all sequences
+    all_sequences.append(sequence)
+f.close()
+print('Final sequences are ', all_sequences)
+print('Final items are ', all_items)
+# total_cnt=len(lines)
+sequences_count = len(all_sequences)
+print('Count of sequences is ', sequences_count)
+ms_gsp(all_sequences, min_supports, all_items, sdc)
 
 # List to store all sequences extracted from the file
 all_sequences = []
