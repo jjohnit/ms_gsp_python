@@ -211,10 +211,32 @@ def length_sequence(seq):
 
 # To check whether a subsequence is present in a sequence
 # eg: subsequence = [['20', '30', '70']] or [['20', '30'], ['70']]
-# eg sequence = [['10', '40', '50'], ['40', '90']]
-# def is_contained(sequences, subsequence):
-#     for group in subsequence:
-#         for seq in sequences:
+# eg sequence = [['20', '30'], ['70', '80'], ['20', '30', '70']]
+def is_contained(sequence, subsequence):
+    # If the subsequence contain only one list
+    if len(subsequence) == 1:
+        # Check whether each item of subsequence is present in the sequence in the same order
+        for seq in sequence:
+            flag = False
+            for item in subsequence[0]:
+                # if item is in the sequence, check whether the remaining items comes after in the sequence
+                # slice the seq list from the occurance of the element of this  
+                if item in seq:
+                    seq = seq[seq.index(item):]
+                    flag = True
+                # If the item is not present in the sequence, check for the same in the next seq
+                else:
+                    flag = False
+                    break
+            # If flag is true after checking all items in the subsequence with a sequence, then return true
+            if flag:
+                return True
+        return False
+    print("Outside if condition")
+    return False
+        
+
+
 
 
 # MS GSP algorithm with params
@@ -244,9 +266,11 @@ def ms_gsp(sequences, min_supports, all_items, sdc):
 
     # Create frequent list from the candidate sequences
     # Iterate through each sequence in candidate sequences
+    # eg candidate sequence: [[['20', '30', '70']], [['20', '30'], ['70']]]
     # for candidate in candidate_sequence:  
-    #     # Iterate through each sequence in all sequence list  
-    #     for seq in sequences:
+        # Iterate through each sequence in all sequence list  
+        # eg all sequences: [[['10', '40', '50'], ['40', '90']], [['20', '30'], ['70', '80'], ['20', '30', '70']]]
+        # for seq in sequences:
 
             
     pass
@@ -327,4 +351,5 @@ print('Final items are ', all_items)
 # total_cnt=len(lines)
 sequences_count = len(all_sequences)
 print('Count of sequences is ', sequences_count)
-ms_gsp(all_sequences, min_supports, all_items, sdc)
+# ms_gsp(all_sequences, min_supports, all_items, sdc)
+# print(is_contained([['20', '30'], ['70', '80'], ['20', '30', '70']], [['70', '20']]))
