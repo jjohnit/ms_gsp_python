@@ -210,7 +210,7 @@ def length_sequence(seq):
     return length
 
 # To check whether a subsequence is present in a sequence
-# eg: subsequence = [['20', '30', '70']] or [['20', '30'], ['70']]
+# eg: subsequence = [['20', '30', '70']] or [['20', '30'], ['90']]
 # eg sequence = [['20', '30'], ['70', '80'], ['20', '30', '70']]
 def is_contained(sequence, subsequence):
     # If the subsequence contain only one list
@@ -232,8 +232,25 @@ def is_contained(sequence, subsequence):
             if flag:
                 return True
         return False
-    print("Outside if condition")
-    return False
+    # If the subsequence contains multiple lists
+    else:
+        flag = False
+        group = seq = 0
+        # print("Seq len ", len(sequence)," group len ", len(subsequence))
+        while((group < len(subsequence)) & (seq < len(sequence))):
+            # print("Seq is ", sequence[seq]," group is ", subsequence[group])
+            # If the subsequence group present in sequence group, check for the 
+            # next subsequence group in the next sequence group
+            if is_contained([sequence[seq]], [subsequence[group]]):   # Converted to a list of list since the function is expecting that
+                flag = True
+                group += 1
+                seq += 1
+            # If the subsequence group not present in sequence group, check for the 
+            # same subsequence group in the next sequence group
+            else:
+                flag = False
+                seq += 1
+        return flag
         
 
 
@@ -352,4 +369,17 @@ print('Final items are ', all_items)
 sequences_count = len(all_sequences)
 print('Count of sequences is ', sequences_count)
 # ms_gsp(all_sequences, min_supports, all_items, sdc)
-# print(is_contained([['20', '30'], ['70', '80'], ['20', '30', '70']], [['70', '20']]))
+
+#region Testing is_contained function
+# print("True is ", is_contained([['10', '30'], ['70', '80'], ['20', '30', '70']], [['10', '30']]))
+# print("True is ", is_contained([['20', '30'], ['70', '80'], ['20', '30', '70']], [['30', '70']]))
+# print("False is ", is_contained([['20', '30'], ['70', '80'], ['20', '30', '70']], [['30', '20']]))
+# print("False is ", is_contained([['20', '30'], ['20', '30', '70']], [['70', '80']]))
+
+# print("True is ", is_contained([['20', '30'], ['70', '80'], ['20', '30', '70']], [['20', '30'], ['80']]))
+# print("True is ", is_contained([['20', '30'], ['70', '80'], ['20', '30', '70']], [['80'], ['70']]))
+# print("True is ", is_contained([['20', '30'], ['70', '80'], ['20', '30', '70']], [['30'], ['70', '80']]))
+# print("True is ", is_contained([['20', '30'], ['70', '80'], ['20', '30', '70']], [['30'], ['20']]))
+# print("False is ", is_contained([['20', '30'], ['70', '80'], ['20', '30', '70']], [['70'], ['70', '80']]))
+# print("False is ", is_contained([['20', '30'], ['70', '80'], ['20', '40', '70']], [['70'], ['20', '30']]))
+#endregion
