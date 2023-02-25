@@ -24,26 +24,6 @@ def init_pass(sorted_items, all_sequences, min_support):
     for key in support_counts.keys():
         support_counts[key] = support_counts[key] / total_sequences
     # Add items with minimum support to the init_candidate_set
-# sorted_items = list of items sorted by min support
-# seqs_list = list of all sequences
-# min_support = minimum support
-def init_pass(sorted_items, all_sequences, min_support):
-    init_candidate_set = []
-    print('Minimum support is ', min_support)
-    total_sequences = len(all_sequences)
-    # Find support count of each item by iterating through the sequences
-    support_counts = {}
-    for item in sorted_items:
-        for seq in all_sequences:
-            for itemset in seq:
-                if(item in itemset):
-                    support_counts[item] = 1 if(support_counts.get(item) == None) else (support_counts[item] + 1)
-                    break                    
-    print('Support counts are ', support_counts)
-    # Convert the support count to percentage
-    for key in support_counts.keys():
-        support_counts[key] = support_counts[key] / total_sequences
-    # Add items with minimum support to the init_candidate_set
     for item in sorted_items:
         if support_counts[item] >= min_support:
             init_candidate_set.append(item)
@@ -106,7 +86,7 @@ def lvl_2_candidate_gen(freq_item_set, sup_counts, sdc):
     return candidate_list
 
 # for creating min support candidate sets
-def ms_candidate_gen(candidate_list, min_supports,sdc):     # Is sdc not required ?
+def ms_candidate_gen(candidate_list, min_supports,sdc):
     candidate_sequence=[]
     
     for seq1 in candidate_list:
@@ -124,7 +104,7 @@ def ms_candidate_gen(candidate_list, min_supports,sdc):     # Is sdc not require
             # last_seq2=seq2_copy[len(seq2_copy)-1][len(seq2_copy[len(seq2_copy)-1])-1]
             
             if min_supports[first_seq1] < least_mis_sequence(seq1, 0, 0):
-                seq1_copy[0].pop(0)         # Shouldn't we drop the 2nd item of sequence 1 ?
+                seq1_copy[0].pop(0)
                 seq1_copy = [ele for ele in seq1_copy if ele != []]
                 seq2_copy[-1].pop(-1)
                 # seq2_copy[len(seq2_copy)-1].pop(len(seq2_copy[len(seq2_copy)-1])-1)
@@ -148,7 +128,6 @@ def ms_candidate_gen(candidate_list, min_supports,sdc):     # Is sdc not require
                         # seq_copy[len(seq_copy)-1].append(last_seq2)
                         candidate_sequence+=[seq_copy]
             # elif min_supports[last_seq2] < least_mis_sequence(seq2,len(seq2)-1,len(seq2[len(seq2)-1])-1):
-            # Why do we need 2 separate conditions when the content is same ?
             elif min_supports[last_seq2] < least_mis_sequence(seq2,len(seq2)-1,len(seq2[-1])-1):
                 seq2_copy[0].pop(0)
                 seq2_copy = [ele for ele in seq2_copy if ele != []]
@@ -207,10 +186,10 @@ def sort_items(all_items, min_supports):
 # Find least MIS value in a sequence excluding the MIS of the value 
 # at 'index1' and 'index2'
 def least_mis_sequence(seq,index1,index2):
+    least_mis=1
     if index1!=None and index2!=None:
-        least_mis=1
         seq_copy=copy.deepcopy(seq)
-        seq_copy[index1].pop(index2)        # What is this ?
+        seq_copy[index1].pop(index2)
         for grp in seq_copy:
             for item in grp:
                 if min_supports[item]<least_mis:
@@ -219,7 +198,7 @@ def least_mis_sequence(seq,index1,index2):
         seq_copy=copy.deepcopy(seq)
         for grp in seq_copy:
             for item in grp:
-                if min_supports[item]<least_mis:        # least_mis should be outside the if condition ?
+                if min_supports[item]<least_mis:
                     least_mis=min_supports[item]
     return least_mis
 
@@ -349,38 +328,3 @@ print('Final items are ', all_items)
 sequences_count = len(all_sequences)
 print('Count of sequences is ', sequences_count)
 ms_gsp(all_sequences, min_supports, all_items, sdc)
-
-# # List to store all sequences extracted from the file
-# all_sequences = []
-# for line in lines:
-#     # sequence_of_sorted_items = []
-#     seqs_regex = re.compile(r'({.*})')
-#     # Extract the item sets in each sequence
-#     item_sets = seqs_regex.search(line)
-#     # Create the sequence as a list of item sets
-#     sequence_txt = item_sets.group(1).split('}')
-#     sequence = []
-#     # Removing the empty string at the end
-#     sequence_txt.pop()
-#     for i in sequence_txt:
-#         item_list = []
-#         # Ignore the 1st char '{'
-#         i = i[1:]
-#         # For getting each item in the sequence
-#         items = i.split(',')
-#         # Create the item list as a list to be added to the sequence list
-#         for item in items:
-#             item = item.strip()
-#             item_list.append(item)
-#             all_items.add(item)
-#         # Add the item list to the sequence
-#         sequence.append(item_list)
-#     # Add the sequence to all sequences
-#     all_sequences.append(sequence)
-# f.close()
-# print('Final sequences are ', all_sequences)
-# print('Final items are ', all_items)
-# # total_cnt=len(lines)
-# sequences_count = len(all_sequences)
-# print('Count of sequences is ', sequences_count)
-# ms_gsp(all_sequences, min_supports, all_items, sdc)
