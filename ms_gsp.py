@@ -230,11 +230,17 @@ def length_sequence(seq):
         length+=len(grp)
     return length
 
+# To check whether a subsequence is present in a sequence
+# eg: subsequence = [['20', '30', '70']] or [['20', '30'], ['70']]
+# eg sequence = [['10', '40', '50'], ['40', '90']]
+# def is_contained(sequences, subsequence):
+#     for group in subsequence:
+#         for seq in sequences:
+
+
 # MS GSP algorithm with params
 # sequences = list of all sequenses
 # min_supports = list of all minimum supports
-
-
 def ms_gsp(sequences, min_supports, all_items, sdc):
     # sort the items set in the sequences based on the ms value to create 'sorted_itemsets'
     sorted_items = sort_items(all_items, min_supports)
@@ -256,6 +262,14 @@ def ms_gsp(sequences, min_supports, all_items, sdc):
 
     #frequent_items = frequent_item_set(candidate_list, support_counts, sdc)
     candidate_sequence = ms_candidate_gen(candidate_list, min_supports, sdc)
+
+    # Create frequent list from the candidate sequences
+    # Iterate through each sequence in candidate sequences
+    # for candidate in candidate_sequence:  
+    #     # Iterate through each sequence in all sequence list  
+    #     for seq in sequences:
+
+            
     pass
 
 
