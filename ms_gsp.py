@@ -252,6 +252,22 @@ def is_contained(sequence, subsequence):
                 seq += 1
         return flag
         
+# To find the item with minimum item support
+def find_min_mis_item(candidate, min_supports):
+    if(len(candidate) == 1):
+        min_mis_item = candidate[0][0]
+        for item in candidate[0]:
+            if min_supports[item] < min_supports[min_mis_item]:
+                min_mis_item = item
+        return min_mis_item
+    else:
+        min_mis_item = candidate[0][0]
+        for group in candidate:
+            temp_item = find_min_mis_item([group], min_supports)
+            if min_supports[temp_item] < min_supports[min_mis_item]:
+                min_mis_item = temp_item
+        return min_mis_item
+            
 
 
 
@@ -276,21 +292,35 @@ def ms_gsp(sequences, min_supports, all_items, sdc):
     # Create level 2 candidate list
     # Why can't we pass frequent item set 1 instead of initial candidate set,
     # considering we are eliminating items based on support count in the function?
-    candidate_list = lvl_2_candidate_gen(freq_item_set, support_counts, sdc)
+    candidate_sequence = lvl_2_candidate_gen(freq_item_set, support_counts, sdc)
 
     #frequent_items = frequent_item_set(candidate_list, support_counts, sdc)
-    candidate_sequence = ms_candidate_gen(candidate_list, min_supports, sdc)
 
-    # Create frequent list from the candidate sequences
-    # Iterate through each sequence in candidate sequences
-    # eg candidate sequence: [[['20', '30', '70']], [['20', '30'], ['70']]]
-    # for candidate in candidate_sequence:  
-        # Iterate through each sequence in all sequence list  
-        # eg all sequences: [[['10', '40', '50'], ['40', '90']], [['20', '30'], ['70', '80'], ['20', '30', '70']]]
-        # for seq in sequences:
-
+    sequences_count = len(sequences)
+    while len(freq_item_set) > 0:
+        freq_item_set = []
+        # Create frequent list from the candidate sequences
+        # Iterate through each sequence in candidate sequences
+        # eg candidate sequence: [[['20', '30', '70']], [['20', '30'], ['70']]]
+        for candidate in candidate_sequence:
+            # Find the candidate with min
+            candidate_count = 0
+            # Iterate through each sequence in all sequence list  
+            # eg all sequences: [[['10', '40', '50'], ['40', '90']], [['20', '30'], ['70', '80'], ['20', '30', '70']]]
+            for seq in sequences:
+                # If the candidate is present in the sequence, increment the count
+                if is_contained(seq, candidate):
+                    candidate_count += 1
             
-    pass
+            min_mis_item = find_min_mis_item(candidate, min_supports)
+            # Add the candidate to frequent item set
+            if (candidate_count / sequences_count) > min_supports[min_mis_item]:
+                freq_item_set.append(candidate)
+        
+        if len(freq_item_set) <= 0:
+            break
+        candidate_sequence = ms_candidate_gen(freq_item_set, min_supports, sdc)
+    
 
 
 
@@ -368,7 +398,7 @@ print('Final items are ', all_items)
 # total_cnt=len(lines)
 sequences_count = len(all_sequences)
 print('Count of sequences is ', sequences_count)
-# ms_gsp(all_sequences, min_supports, all_items, sdc)
+ms_gsp(all_sequences, min_supports, all_items, sdc)
 
 #region Testing is_contained function
 # print("True is ", is_contained([['10', '30'], ['70', '80'], ['20', '30', '70']], [['10', '30']]))
@@ -382,4 +412,15 @@ print('Count of sequences is ', sequences_count)
 # print("True is ", is_contained([['20', '30'], ['70', '80'], ['20', '30', '70']], [['30'], ['20']]))
 # print("False is ", is_contained([['20', '30'], ['70', '80'], ['20', '30', '70']], [['70'], ['70', '80']]))
 # print("False is ", is_contained([['20', '30'], ['70', '80'], ['20', '40', '70']], [['70'], ['20', '30']]))
+#endregion
+
+#region Testing find_min_mis_item function
+# print("20 is ", find_min_mis_item([['20', '40', '70']], min_supports))
+# print("70 is ", find_min_mis_item([['40', '70', '20']], min_supports))
+# print("20 is ", find_min_mis_item([['20', '70'], ['40']], min_supports))
+# print("70 is ", find_min_mis_item([['70', '40'], ['20']], min_supports))
+# print("70 is ", find_min_mis_item([['40', '70'], ['20']], min_supports))
+# print("20 is ", find_min_mis_item([['40'], ['20', '70']], min_supports))
+# print("20 is ", find_min_mis_item([['20'], ['70', '40']], min_supports))
+# print("20 is ", find_min_mis_item([['20'], ['40', '70']], min_supports))
 #endregion
