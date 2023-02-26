@@ -177,7 +177,7 @@ def ms_candidate_gen(candidate_list, min_supports,sdc):
                     #    seq_copy[len(seq_copy)-1].append(last_seq2)
                        candidate_sequence+=[seq_copy] 
                         
-    print("Candidate sequences before pruning:",candidate_sequence)
+    #print("Candidate sequences before pruning:",candidate_sequence)
     
     #Pruning step
     final_candidate_sequence = []
@@ -199,15 +199,15 @@ def ms_candidate_gen(candidate_list, min_supports,sdc):
                     temp_can_seq_list.append(temp_can_seq)
         #print('Temp k-1 subsequences list:',temp_can_seq_list)
         flag=0
-        print('Pruned candidate sequences')
+        #print('Pruned candidate sequences')
         for temp_seq in temp_can_seq_list:
             if temp_seq not in candidate_list:
             #if any of the K-1 subsequences not in the K-1 candidate list then set flag to 1    
                 flag=1
-                print(seq)
+                #print(seq)
         if flag!=1:
             final_candidate_sequence.append(seq)
-    print("Candidate sequences after pruning:",final_candidate_sequence)
+    #print("Candidate sequences after pruning:",final_candidate_sequence)
     return final_candidate_sequence                
                 
                 
@@ -251,6 +251,7 @@ def length_sequence(seq):
         length+=len(grp)
     return length
 
+'''
 # To check whether a subsequence is present in a sequence
 # eg: subsequence = [['20', '30', '70']] or [['20', '30'], ['90']]
 # eg sequence = [['20', '30'], ['70', '80'], ['20', '30', '70']]
@@ -293,7 +294,37 @@ def is_contained(sequence, subsequence):
                 flag = False
                 seq += 1
         return flag
-        
+'''        
+# Rewriting the function for testing purpose    
+def is_contained(sequence,subsequence):
+    i=0
+    count=0
+    j=0
+    #print('Subsequence:',subsequence)
+    #print('Sequence:',sequence)
+    while(j<len(subsequence)):
+        while(i<len(sequence)):
+            group=sequence[i]
+            if j>=len(subsequence):
+                break
+            group_sub=subsequence[j]
+            #If all items of group_sub also in group
+            #Go to next group and sub-group
+            if all(item in group for item in group_sub):
+                count=count+1;
+                i+=1
+                j+=1
+            #else case 
+            #Go to next group, sub-group remains same
+            else:
+                i+=1
+        j+=1
+    
+    if count==len(subsequence):
+        return True
+    else:
+        return False
+    
 # To find the item with minimum item support
 def find_min_mis_item(candidate, min_supports):
     if(len(candidate) == 1):
@@ -337,13 +368,18 @@ def ms_gsp(sequences, min_supports, all_items, sdc):
     candidate_sequence = lvl_2_candidate_gen(freq_item_set, support_counts, sdc)
 
     #frequent_items = frequent_item_set(candidate_list, support_counts, sdc)
-
+    #Loop counter for testing
+    loop_ctr=0
     sequences_count = len(sequences)
     while len(freq_item_set) > 0:
         freq_item_set = []
         # Create frequent list from the candidate sequences
         # Iterate through each sequence in candidate sequences
         # eg candidate sequence: [[['20', '30', '70']], [['20', '30'], ['70']]]
+        print('Candidate sequence',candidate_sequence)
+        print('Frequent itemset',freq_item_set)
+        if loop_ctr==2:
+            break
         for candidate in candidate_sequence:
             # Find the candidate with min
             candidate_count = 0
@@ -358,10 +394,14 @@ def ms_gsp(sequences, min_supports, all_items, sdc):
             # Add the candidate to frequent item set
             if (candidate_count / sequences_count) > min_supports[min_mis_item]:
                 freq_item_set.append(candidate)
-        
+        print('Frequent itemset:',freq_item_set)
         if len(freq_item_set) <= 0:
             break
         candidate_sequence = ms_candidate_gen(freq_item_set, min_supports, sdc)
+        print('Candidate sequence',candidate_sequence)
+        #Loop counter for testing
+        loop_ctr+=1
+        
     
 
 
@@ -369,10 +409,10 @@ def ms_gsp(sequences, min_supports, all_items, sdc):
 # Pre-processing of data
 # File with sequences (eg: <{10, 40, 50}{40, 90}> <{20, 30}{70, 80}{20, 30, 70}>)
 # sequences_file=str(input('Enter sequences file name:'))
-sequences_file = 'data1.txt'
+sequences_file = 'data2.txt'
 # File minimum item supports (eg: MIS(10) = 0.45 MIS(20) = 0.30)
 # minsups_file=str(input('Enter minimum supports file name:'))
-minsups_file = 'para1.txt'
+minsups_file = 'para2.txt'
 # Open the file to read the lines
 f = open(minsups_file, "r")
 lines = f.readlines()
