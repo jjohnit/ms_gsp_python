@@ -79,18 +79,23 @@ def frequent_item_set(candidate_set, previous_frequent_set):
 def lvl_2_candidate_gen(freq_item_set, sup_counts, sdc):
     candidate_list = []
     for i in range(len(freq_item_set) - 1):
+        #We also need to consider the case where both items are same
+        #As per the example given in project spec
+        candidate_list+=[[[freq_item_set[i]], [freq_item_set[i]]]]
         for j in range(i + 1, len(freq_item_set)):
             if(abs(sup_counts[freq_item_set[j]] - sup_counts[freq_item_set[i]]) <= sdc):
                 candidate_list += [[[freq_item_set[i], freq_item_set[j]]], [[freq_item_set[i]], [freq_item_set[j]]]]
+                #Also consider reverse order in sequence
+                candidate_list +=[[[freq_item_set[j]], [freq_item_set[i]]]]
     print("Level 2 candidate list is ", candidate_list)
     return candidate_list
 
 # for creating min support candidate sets
-def ms_candidate_gen(candidate_list, min_supports,sdc):
+def ms_candidate_gen(freq_item_set, min_supports,sdc):
     candidate_sequence=[]
     
-    for seq1 in candidate_list:
-        for seq2 in candidate_list:
+    for seq1 in freq_item_set:
+        for seq2 in freq_item_set:
             seq1_copy=copy.deepcopy(seq1)
             #First and last elements of seq1
             first_seq1=seq1_copy[0][0]
@@ -207,7 +212,7 @@ def ms_candidate_gen(candidate_list, min_supports,sdc):
         flag=0
         #print('Pruned candidate sequences')
         for temp_seq in temp_can_seq_list:
-            if temp_seq not in candidate_list:
+            if temp_seq not in freq_item_set:
             #if any of the K-1 subsequences not in the K-1 candidate list then set flag to 1    
                 flag=1
                 #print(seq)
@@ -355,6 +360,10 @@ def find_min_mis_item(candidate, min_supports):
 # sequences = list of all sequenses
 # min_supports = list of all minimum supports
 def ms_gsp(sequences, min_supports, all_items, sdc):
+    #Final sequence of sequences
+    final_sequences={}
+    #Counter for k (k-sequence)
+    k=1
     # sort the items set in the sequences based on the ms value to create 'sorted_itemsets'
     sorted_items = sort_items(all_items, min_supports)
     print('Items sorted based on minimum support: ', sorted_items)
@@ -368,6 +377,7 @@ def ms_gsp(sequences, min_supports, all_items, sdc):
         if support_counts[item] >= min_supports[item]:
             freq_item_set.append(item)
     print("Frequent item set 1 is ", freq_item_set)
+    final_sequences[k]=freq_item_set
     # Create level 2 candidate list
     # Why can't we pass frequent item set 1 instead of initial candidate set,
     # considering we are eliminating items based on support count in the function?
@@ -398,9 +408,12 @@ def ms_gsp(sequences, min_supports, all_items, sdc):
         print('Frequent itemset:',freq_item_set)
         if len(freq_item_set) <= 0:
             break
+        else:
+            k+=1
+            final_sequences[k]=freq_item_set
         candidate_sequence = ms_candidate_gen(freq_item_set, min_supports, sdc)
         #print('Candidate sequence',candidate_sequence)
-        
+    return final_sequences        
     
 
 
@@ -479,7 +492,37 @@ print('Final items are ', all_items)
 # total_cnt=len(lines)
 sequences_count = len(all_sequences)
 print('Count of sequences is ', sequences_count)
-ms_gsp(all_sequences, min_supports, all_items, sdc)
+final_sequences=ms_gsp(all_sequences, min_supports, all_items, sdc)
+
+#Writing the output into file
+output_file = 'output.txt'
+# Open the file to read the lines
+f = open(output_file, "w")
+
+#For k=1
+k=1
+f.write("\n*************")
+f.write("\n"+str(k)+"-sequences")
+for seq in final_sequences[k]:
+    f.write("\n<")
+    f.write("{"+str(seq)+"}")
+    f.write(">")
+
+#Looping over final_sequences
+for k in range(2,len(final_sequences)+1):
+    f.write("\n*************")
+    f.write("\n"+str(k)+"-sequences")
+    for seq in final_sequences[k]:
+        f.write("\n<")
+        for group in seq:
+            group_str = str(group)
+            group_str=group_str.replace("[","{")
+            group_str=group_str.replace("]","}")
+            f.write(group_str)
+        f.write(">")
+f.close()    
+    
+    
 
 #region Testing is_contained function
 # print("True is ", is_contained([['10', '30'], ['70', '80'], ['20', '30', '70']], [['10', '30']]))
