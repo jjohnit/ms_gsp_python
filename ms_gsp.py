@@ -104,11 +104,13 @@ def ms_candidate_gen(candidate_list, min_supports,sdc):
             # last_seq2=seq2_copy[len(seq2_copy)-1][len(seq2_copy[len(seq2_copy)-1])-1]
             
             if min_supports[first_seq1] < least_mis_sequence(seq1, 0, 0):
-                #seq1_copy[0].pop(0)
+                seq1_copy[0].pop(0)
+                '''
                 if len(seq1_copy[0])>1:
                     seq1_copy[0].pop(1)
                 else:
                     seq1_copy[1].pop(0)
+                '''    
                 seq1_copy = [ele for ele in seq1_copy if ele != []]
                 seq2_copy[-1].pop(-1)
                 # seq2_copy[len(seq2_copy)-1].pop(len(seq2_copy[len(seq2_copy)-1])-1)
@@ -133,11 +135,13 @@ def ms_candidate_gen(candidate_list, min_supports,sdc):
                         candidate_sequence+=[seq_copy]
             # elif min_supports[last_seq2] < least_mis_sequence(seq2,len(seq2)-1,len(seq2[len(seq2)-1])-1):
             elif min_supports[last_seq2] < least_mis_sequence(seq2,len(seq2)-1,len(seq2[-1])-1):
-                #seq2_copy[0].pop(0)
+                seq2_copy[0].pop(0)
+                '''
                 if len(seq2_copy[0])>1:
                     seq2_copy[0].pop(1)
                 else:
                     seq2_copy[1].pop(0)
+                '''
                 seq2_copy = [ele for ele in seq2_copy if ele != []]
                 seq1_copy[len(seq1_copy)-1].pop(len(seq1_copy[len(seq1_copy)-1])-1)
                 seq1_copy = [ele for ele in seq1_copy if ele != []]
@@ -156,11 +160,13 @@ def ms_candidate_gen(candidate_list, min_supports,sdc):
                         seq_copy[len(seq_copy)-1]=first_seq1+seq_copy[len(seq_copy)-1]
                         candidate_sequence+=[seq_copy]
             else:
-                #seq1_copy[0].pop(0)
+                seq1_copy[0].pop(0)
+                '''
                 if len(seq1_copy[0])>1:
                     seq1_copy[0].pop(1)
                 else:
                     seq1_copy[1].pop(0)
+                '''
                 seq1_copy = [ele for ele in seq1_copy if ele != []]
                 seq2_copy[-1].pop(len(seq2_copy[-1])-1)
                 # seq2_copy[len(seq2_copy)-1].pop(len(seq2_copy[len(seq2_copy)-1])-1)
@@ -366,20 +372,15 @@ def ms_gsp(sequences, min_supports, all_items, sdc):
     # Why can't we pass frequent item set 1 instead of initial candidate set,
     # considering we are eliminating items based on support count in the function?
     candidate_sequence = lvl_2_candidate_gen(freq_item_set, support_counts, sdc)
-
     #frequent_items = frequent_item_set(candidate_list, support_counts, sdc)
-    #Loop counter for testing
-    loop_ctr=0
     sequences_count = len(sequences)
     while len(freq_item_set) > 0:
         freq_item_set = []
         # Create frequent list from the candidate sequences
         # Iterate through each sequence in candidate sequences
         # eg candidate sequence: [[['20', '30', '70']], [['20', '30'], ['70']]]
-        print('Candidate sequence',candidate_sequence)
-        print('Frequent itemset',freq_item_set)
-        if loop_ctr==2:
-            break
+       # print('Candidate sequence',candidate_sequence)
+        #print('Frequent itemset',freq_item_set)
         for candidate in candidate_sequence:
             # Find the candidate with min
             candidate_count = 0
@@ -398,9 +399,7 @@ def ms_gsp(sequences, min_supports, all_items, sdc):
         if len(freq_item_set) <= 0:
             break
         candidate_sequence = ms_candidate_gen(freq_item_set, min_supports, sdc)
-        print('Candidate sequence',candidate_sequence)
-        #Loop counter for testing
-        loop_ctr+=1
+        #print('Candidate sequence',candidate_sequence)
         
     
 
@@ -409,10 +408,10 @@ def ms_gsp(sequences, min_supports, all_items, sdc):
 # Pre-processing of data
 # File with sequences (eg: <{10, 40, 50}{40, 90}> <{20, 30}{70, 80}{20, 30, 70}>)
 # sequences_file=str(input('Enter sequences file name:'))
-sequences_file = 'data2.txt'
+sequences_file = 'data1.txt'
 # File minimum item supports (eg: MIS(10) = 0.45 MIS(20) = 0.30)
 # minsups_file=str(input('Enter minimum supports file name:'))
-minsups_file = 'para2.txt'
+minsups_file = 'para1.txt'
 # Open the file to read the lines
 f = open(minsups_file, "r")
 lines = f.readlines()
