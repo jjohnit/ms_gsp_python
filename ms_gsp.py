@@ -1,7 +1,7 @@
 # importing modules
 import re
 import copy
-
+import itertools
 
 # Initial pass to create initial candidate set
 # sorted_items = list of items sorted by min support
@@ -106,11 +106,11 @@ def lvl_2_candidate_gen(freq_item_set, sup_counts, sdc):
     return candidate_list
 
 # for creating min support candidate sets
-def ms_candidate_gen(candidate_list, sup_counts,sdc):
+def ms_candidate_gen(final_list, sup_counts,sdc):
     candidate_sequence=[]
     
-    for seq1 in candidate_list:
-        for seq2 in candidate_list:
+    for seq1 in final_list:
+        for seq2 in final_list:
             seq1_copy=copy.deepcopy(seq1)
             #First and last elements of seq1
             first_seq1=seq1_copy[0][0]
@@ -122,7 +122,11 @@ def ms_candidate_gen(candidate_list, sup_counts,sdc):
             last_seq2=seq2_copy[len(seq2_copy)-1][len(seq2_copy[len(seq2_copy)-1])-1]
             
             if min_supports[first_seq1] < least_mis_sequence(seq1, 0, 0):
-                seq1_copy[0].pop(0)
+                #seq1_copy[0].pop(0)
+                if len(seq1_copy[0])>1:
+                    seq1_copy[0].pop(1)
+                else:
+                    seq1_copy[1].pop(0)
                 seq1_copy = [ele for ele in seq1_copy if ele != []]
                 seq2_copy[len(seq2_copy)-1].pop(len(seq2_copy[len(seq2_copy)-1])-1)
                 seq2_copy = [ele for ele in seq2_copy if ele != []]
@@ -142,7 +146,11 @@ def ms_candidate_gen(candidate_list, sup_counts,sdc):
                         seq_copy[len(seq_copy)-1].append(last_seq2)
                         candidate_sequence+=[seq_copy]
             elif min_supports[last_seq2] < least_mis_sequence(seq2,len(seq2)-1,len(seq2[len(seq2)-1])-1):
-                seq2_copy[0].pop(0)
+                #seq2_copy[0].pop(0)
+                if len(seq2_copy[0])>1:
+                    seq2_copy[0].pop(1)
+                else:
+                    seq2_copy[1].pop(0)
                 seq2_copy = [ele for ele in seq2_copy if ele != []]
                 seq1_copy[len(seq1_copy)-1].pop(len(seq1_copy[len(seq1_copy)-1])-1)
                 seq1_copy = [ele for ele in seq1_copy if ele != []]
@@ -161,7 +169,11 @@ def ms_candidate_gen(candidate_list, sup_counts,sdc):
                         seq_copy[len(seq_copy)-1]=first_seq1+seq_copy[len(seq_copy)-1]
                         candidate_sequence+=[seq_copy]
             else:
-                seq1_copy[0].pop(0)
+                #seq1_copy[0].pop(0)
+                if len(seq1_copy[0])>1:
+                    seq1_copy[0].pop(1)
+                else:
+                    seq1_copy[1].pop(0)
                 seq1_copy = [ele for ele in seq1_copy if ele != []]
                 seq2_copy[len(seq2_copy)-1].pop(len(seq2_copy[len(seq2_copy)-1])-1)
                 seq2_copy = [ele for ele in seq2_copy if ele != []]
@@ -178,10 +190,38 @@ def ms_candidate_gen(candidate_list, sup_counts,sdc):
     print("Candidate sequences before pruning:",candidate_sequence)
     
     #Pruning step
-                    
+    final_candidate_sequence = []
+    for seq in candidate_sequence:
+        temp_can_seq_list = []
+        for i in range(0,len(seq)):
+            least_mis_item=''
+            least_mis_item=seq[i][0]
+            for item in seq[i]:
+                if(min_supports[item] < min_supports[least_mis_item]):
+                    least_mis_item = seq[i]
+            for j in range(0,len(seq[i])):
+                temp_can_seq = copy.deepcopy(seq)
+                #We need not check the k-1 subsequences which contain the item with minimum MIS value
+                #Hence, we do not create temp sequence for the sequence that contains the item with minimum MIS
+                if(temp_can_seq[i][j] != least_mis_item):
+                    temp_can_seq[i].pop(j)
+                    temp_can_seq = [ele for ele in temp_can_seq if ele != []]
+                    temp_can_seq_list.append(temp_can_seq)
+        print('Temp k-1 subsequences list:',temp_can_seq_list)
+        flag=0
+        print('Pruned candidate sequences')
+        for temp_seq in temp_can_seq_list:
+            if temp_seq not in final_list:
+            #if any of the K-1 subsequences not in the K-1 candidate list then set flag to 1    
+                flag=1
+                print(seq)
+        if flag!=1:
+            final_candidate_sequence.append(seq)
+    print("Candidate sequences after pruning:",final_candidate_sequence)
+    return final_candidate_sequence
+        
                 
-                
-            
+                         
         
 # Function for sorting the items based on the minimum support
 def sort_items(all_items, min_supports):
@@ -197,14 +237,15 @@ def sort_items(all_items, min_supports):
 # at 'index1' and 'index2'
 def least_mis_sequence(seq,index1,index2):
     if index1!=None and index2!=None:
-        least_mis=1
         seq_copy=copy.deepcopy(seq)
         seq_copy[index1].pop(index2)
+        least_mis=min_supports[seq[0][0]]
         for grp in seq_copy:
             for item in grp:
                 if min_supports[item]<least_mis:
                     least_mis=min_supports[item]
     else:
+        least_mis=min_supports[seq[0][0]]
         seq_copy=copy.deepcopy(seq)
         for grp in seq_copy:
             for item in grp:
@@ -242,9 +283,12 @@ def ms_gsp(sequences, min_supports, all_items, sdc):
     # Why can't we pass frequent item set 1 instead of initial candidate set,
     # considering we are eliminating items based on support count in the function?
     candidate_list = lvl_2_candidate_gen(freq_item_set, support_counts, sdc)
-
+    
     #frequent_items = frequent_item_set(candidate_list, support_counts, sdc)
-    candidate_sequence = ms_candidate_gen(candidate_list, min_supports, sdc)
+    #As of now, we are passing the previous candidate list itself to ms_candidate_gen
+    #Need to pass the previous final list F[K-1] and not the candidate list C[K-1]
+    final_list = candidate_list
+    candidate_sequence = ms_candidate_gen(final_list, min_supports, sdc)
     pass
 
 
@@ -252,10 +296,10 @@ def ms_gsp(sequences, min_supports, all_items, sdc):
 # Pre-processing of data
 # File with sequences (eg: <{10, 40, 50}{40, 90}> <{20, 30}{70, 80}{20, 30, 70}>)
 # sequences_file=str(input('Enter sequences file name:'))
-sequences_file = 'data1.txt'
+sequences_file = 'data2.txt'
 # File minimum item supports (eg: MIS(10) = 0.45 MIS(20) = 0.30)
 # minsups_file=str(input('Enter minimum supports file name:'))
-minsups_file = 'para1.txt'
+minsups_file = 'para2.txt'
 # Open the file to read the lines
 f = open(minsups_file, "r")
 lines = f.readlines()
