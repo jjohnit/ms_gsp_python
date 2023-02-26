@@ -507,6 +507,7 @@ for seq in final_sequences[k]:
     f.write("\n<")
     f.write("{"+str(seq)+"}")
     f.write(">")
+f.write("\nThe count is "+str(len(final_sequences[k])))
 
 #Looping over final_sequences
 for k in range(2,len(final_sequences)+1):
@@ -520,6 +521,7 @@ for k in range(2,len(final_sequences)+1):
             group_str=group_str.replace("]","}")
             f.write(group_str)
         f.write(">")
+    f.write("\nThe count is "+str(len(final_sequences[k])))
 f.close()    
     
     
