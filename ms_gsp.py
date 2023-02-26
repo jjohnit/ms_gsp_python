@@ -104,7 +104,11 @@ def ms_candidate_gen(candidate_list, min_supports,sdc):
             # last_seq2=seq2_copy[len(seq2_copy)-1][len(seq2_copy[len(seq2_copy)-1])-1]
             
             if min_supports[first_seq1] < least_mis_sequence(seq1, 0, 0):
-                seq1_copy[0].pop(0)
+                #seq1_copy[0].pop(0)
+                if len(seq1_copy[0])>1:
+                    seq1_copy[0].pop(1)
+                else:
+                    seq1_copy[1].pop(0)
                 seq1_copy = [ele for ele in seq1_copy if ele != []]
                 seq2_copy[-1].pop(-1)
                 # seq2_copy[len(seq2_copy)-1].pop(len(seq2_copy[len(seq2_copy)-1])-1)
@@ -129,7 +133,11 @@ def ms_candidate_gen(candidate_list, min_supports,sdc):
                         candidate_sequence+=[seq_copy]
             # elif min_supports[last_seq2] < least_mis_sequence(seq2,len(seq2)-1,len(seq2[len(seq2)-1])-1):
             elif min_supports[last_seq2] < least_mis_sequence(seq2,len(seq2)-1,len(seq2[-1])-1):
-                seq2_copy[0].pop(0)
+                #seq2_copy[0].pop(0)
+                if len(seq2_copy[0])>1:
+                    seq2_copy[0].pop(1)
+                else:
+                    seq2_copy[1].pop(0)
                 seq2_copy = [ele for ele in seq2_copy if ele != []]
                 seq1_copy[len(seq1_copy)-1].pop(len(seq1_copy[len(seq1_copy)-1])-1)
                 seq1_copy = [ele for ele in seq1_copy if ele != []]
@@ -148,7 +156,11 @@ def ms_candidate_gen(candidate_list, min_supports,sdc):
                         seq_copy[len(seq_copy)-1]=first_seq1+seq_copy[len(seq_copy)-1]
                         candidate_sequence+=[seq_copy]
             else:
-                seq1_copy[0].pop(0)
+                #seq1_copy[0].pop(0)
+                if len(seq1_copy[0])>1:
+                    seq1_copy[0].pop(1)
+                else:
+                    seq1_copy[1].pop(0)
                 seq1_copy = [ele for ele in seq1_copy if ele != []]
                 seq2_copy[-1].pop(len(seq2_copy[-1])-1)
                 # seq2_copy[len(seq2_copy)-1].pop(len(seq2_copy[len(seq2_copy)-1])-1)
@@ -168,7 +180,35 @@ def ms_candidate_gen(candidate_list, min_supports,sdc):
     print("Candidate sequences before pruning:",candidate_sequence)
     
     #Pruning step
-                    
+    final_candidate_sequence = []
+    for seq in candidate_sequence:
+        temp_can_seq_list = []
+        for i in range(0,len(seq)):
+            least_mis_item=''
+            least_mis_item=seq[i][0]
+            for item in seq[i]:
+                if(min_supports[item] < min_supports[least_mis_item]):
+                    least_mis_item = seq[i]
+            for j in range(0,len(seq[i])):
+                temp_can_seq = copy.deepcopy(seq)
+                #We need not check the k-1 subsequences which contain the item with minimum MIS value
+                #Hence, we do not create temp sequence for the sequence that contains the item with minimum MIS
+                if(temp_can_seq[i][j] != least_mis_item):
+                    temp_can_seq[i].pop(j)
+                    temp_can_seq = [ele for ele in temp_can_seq if ele != []]
+                    temp_can_seq_list.append(temp_can_seq)
+        #print('Temp k-1 subsequences list:',temp_can_seq_list)
+        flag=0
+        print('Pruned candidate sequences')
+        for temp_seq in temp_can_seq_list:
+            if temp_seq not in candidate_list:
+            #if any of the K-1 subsequences not in the K-1 candidate list then set flag to 1    
+                flag=1
+                print(seq)
+        if flag!=1:
+            final_candidate_sequence.append(seq)
+    print("Candidate sequences after pruning:",final_candidate_sequence)
+    return final_candidate_sequence                
                 
                 
             
@@ -186,15 +226,17 @@ def sort_items(all_items, min_supports):
 # Find least MIS value in a sequence excluding the MIS of the value 
 # at 'index1' and 'index2'
 def least_mis_sequence(seq,index1,index2):
-    least_mis=1
+    #least_mis=1
     if index1!=None and index2!=None:
         seq_copy=copy.deepcopy(seq)
         seq_copy[index1].pop(index2)
+        least_mis=min_supports[seq[0][0]]
         for grp in seq_copy:
             for item in grp:
                 if min_supports[item]<least_mis:
                     least_mis=min_supports[item]
     else:
+        least_mis=min_supports[seq[0][0]]
         seq_copy=copy.deepcopy(seq)
         for grp in seq_copy:
             for item in grp:
