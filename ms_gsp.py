@@ -45,9 +45,6 @@ def init_pass(sorted_items, all_sequences, min_support):
 #     return freq_item_set
 #endregion
 
-# Create the frequent item set using the candidate set and previous frequent set
-def frequent_item_set(candidate_set, previous_frequent_set):
-    pass
 
 #region Create lvl 2 candidate sequence
 # def lvl_2_candidate_gen(L):
@@ -195,11 +192,13 @@ def ms_candidate_gen(freq_item_set, min_supports,sdc):
     for seq in candidate_sequence:
         temp_can_seq_list = []
         for i in range(0,len(seq)):
-            least_mis_item=''
             least_mis_item=seq[i][0]
+            highest_mis_item=seq[i][0]
             for item in seq[i]:
                 if(min_supports[item] < min_supports[least_mis_item]):
-                    least_mis_item = seq[i]
+                    least_mis_item = item
+                if(min_supports[item] > min_supports[highest_mis_item]):
+                    highest_mis_item = item
             for j in range(0,len(seq[i])):
                 temp_can_seq = copy.deepcopy(seq)
                 #We need not check the k-1 subsequences which contain the item with minimum MIS value
@@ -216,7 +215,7 @@ def ms_candidate_gen(freq_item_set, min_supports,sdc):
             #if any of the K-1 subsequences not in the K-1 candidate list then set flag to 1    
                 flag=1
                 #print(seq)
-        if flag!=1:
+        if flag!=1 & (min_supports[highest_mis_item] - min_supports[least_mis_item] <= sdc):
             final_candidate_sequence.append(seq)
     #print("Candidate sequences after pruning:",final_candidate_sequence)
     return final_candidate_sequence                
@@ -412,7 +411,7 @@ def ms_gsp(sequences, min_supports, all_items, sdc):
             k+=1
             final_sequences[k]=freq_item_set
         candidate_sequence = ms_candidate_gen(freq_item_set, min_supports, sdc)
-        #print('Candidate sequence',candidate_sequence)
+        print('Candidate sequence',candidate_sequence)
     return final_sequences        
     
 
