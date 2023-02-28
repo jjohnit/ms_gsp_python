@@ -420,10 +420,10 @@ def ms_gsp(sequences, min_supports, all_items, sdc):
 # Pre-processing of data
 # File with sequences (eg: <{10, 40, 50}{40, 90}> <{20, 30}{70, 80}{20, 30, 70}>)
 # sequences_file=str(input('Enter sequences file name:'))
-sequences_file = 'data1.txt'
+sequences_file = 'data2.txt'
 # File minimum item supports (eg: MIS(10) = 0.45 MIS(20) = 0.30)
 # minsups_file=str(input('Enter minimum supports file name:'))
-minsups_file = 'para1.txt'
+minsups_file = 'para2-1.txt'
 # Open the file to read the lines
 f = open(minsups_file, "r")
 lines = f.readlines()
@@ -466,7 +466,8 @@ for line in lines:
     # Extract the item sets in each sequence
     item_sets = seqs_regex.search(line)
     # Create the sequence as a list of item sets
-    sequence_txt = item_sets.group(1).split('}')
+    if item_sets!=None:
+        sequence_txt = item_sets.group(1).split('}')
     sequence = []
     # Removing the empty string at the end
     sequence_txt.pop()
@@ -494,7 +495,7 @@ print('Count of sequences is ', sequences_count)
 final_sequences=ms_gsp(all_sequences, min_supports, all_items, sdc)
 
 #Writing the output into file
-output_file = 'output.txt'
+output_file = 'output2-1.txt'
 # Open the file to read the lines
 f = open(output_file, "w")
 
