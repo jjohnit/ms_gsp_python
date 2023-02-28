@@ -45,9 +45,6 @@ def init_pass(sorted_items, all_sequences, min_support):
 #     return freq_item_set
 #endregion
 
-# Create the frequent item set using the candidate set and previous frequent set
-def frequent_item_set(candidate_set, previous_frequent_set):
-    pass
 
 #region Create lvl 2 candidate sequence
 # def lvl_2_candidate_gen(L):
@@ -195,11 +192,13 @@ def ms_candidate_gen(freq_item_set, min_supports,sdc):
     for seq in candidate_sequence:
         temp_can_seq_list = []
         for i in range(0,len(seq)):
-            least_mis_item=''
             least_mis_item=seq[i][0]
+            highest_mis_item=seq[i][0]
             for item in seq[i]:
                 if(min_supports[item] < min_supports[least_mis_item]):
-                    least_mis_item = seq[i]
+                    least_mis_item = item
+                if(min_supports[item] > min_supports[highest_mis_item]):
+                    highest_mis_item = item
             for j in range(0,len(seq[i])):
                 temp_can_seq = copy.deepcopy(seq)
                 #We need not check the k-1 subsequences which contain the item with minimum MIS value
@@ -216,7 +215,7 @@ def ms_candidate_gen(freq_item_set, min_supports,sdc):
             #if any of the K-1 subsequences not in the K-1 candidate list then set flag to 1    
                 flag=1
                 #print(seq)
-        if flag!=1:
+        if flag!=1 & (min_supports[highest_mis_item] - min_supports[least_mis_item] <= sdc):
             final_candidate_sequence.append(seq)
     #print("Candidate sequences after pruning:",final_candidate_sequence)
     return final_candidate_sequence                
@@ -412,7 +411,7 @@ def ms_gsp(sequences, min_supports, all_items, sdc):
             k+=1
             final_sequences[k]=freq_item_set
         candidate_sequence = ms_candidate_gen(freq_item_set, min_supports, sdc)
-        #print('Candidate sequence',candidate_sequence)
+        print('Candidate sequence',candidate_sequence)
     return final_sequences        
     
 
@@ -421,10 +420,10 @@ def ms_gsp(sequences, min_supports, all_items, sdc):
 # Pre-processing of data
 # File with sequences (eg: <{10, 40, 50}{40, 90}> <{20, 30}{70, 80}{20, 30, 70}>)
 # sequences_file=str(input('Enter sequences file name:'))
-sequences_file = 'data1.txt'
+sequences_file = 'data2.txt'
 # File minimum item supports (eg: MIS(10) = 0.45 MIS(20) = 0.30)
 # minsups_file=str(input('Enter minimum supports file name:'))
-minsups_file = 'para1.txt'
+minsups_file = 'para2-1.txt'
 # Open the file to read the lines
 f = open(minsups_file, "r")
 lines = f.readlines()
@@ -467,7 +466,8 @@ for line in lines:
     # Extract the item sets in each sequence
     item_sets = seqs_regex.search(line)
     # Create the sequence as a list of item sets
-    sequence_txt = item_sets.group(1).split('}')
+    if item_sets!=None:
+        sequence_txt = item_sets.group(1).split('}')
     sequence = []
     # Removing the empty string at the end
     sequence_txt.pop()
@@ -495,7 +495,7 @@ print('Count of sequences is ', sequences_count)
 final_sequences=ms_gsp(all_sequences, min_supports, all_items, sdc)
 
 #Writing the output into file
-output_file = 'output.txt'
+output_file = 'output2-1.txt'
 # Open the file to read the lines
 f = open(output_file, "w")
 
